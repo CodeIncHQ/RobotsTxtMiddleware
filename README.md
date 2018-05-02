@@ -1,4 +1,4 @@
-# `robots.txt` PSR-15 middleware 
+# Robots.txt PSR-15 middleware 
 
 [`RobotsTxtMiddleware`](src/RobotsTxtMiddleware.php) is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware dedicated to answer `/robots.txt` requests. It uses [arcanedev/robots](https://github.com/ARCANEDEV/Robots) to generate the response in the [`robots.txt` format](https://developers.google.com/search/reference/robots_txt).
 
