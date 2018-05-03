@@ -2,8 +2,6 @@
 
 [`RobotsTxtMiddleware`](src/RobotsTxtMiddleware.php) is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware dedicated to answer `/robots.txt` requests. It uses [arcanedev/robots](https://github.com/ARCANEDEV/Robots) to generate the response in the [`robots.txt` format](https://developers.google.com/search/reference/robots_txt).
 
-:exclamation: This library is extracted from the now deprecated [codeinc/psr15-middlewares](https://packagist.org/packages/codeinc/psr15-middlewares) package.
-
 
 ## Installation
 
@@ -12,6 +10,9 @@ This library is available through [Packagist](https://packagist.org/packages/cod
 ```bash
 composer require codeinc/robots-txt-middleware
 ```
+
+:speech_balloon: This library is extracted from the now deprecated [codeinc/psr15-middlewares](https://packagist.org/packages/codeinc/psr15-middlewares) package.
+
 
 ## License
 
