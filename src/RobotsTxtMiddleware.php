@@ -42,32 +42,32 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class RobotsTxtMiddleware extends Robots implements MiddlewareInterface
 {
-    /**
-     * @var array
-     */
-    private $robotsTxtUriPaths = ['/robots.txt'];
+    public const DEFAULT_URI_PATH = '/robots.txt';
 
     /**
-     * @param string $path
-     * @return bool
+     * @var string
      */
-    public function addRobotsTxtUriPath(string $path):bool
+    private $uriPath;
+
+    /**
+     * RobotsTxtMiddleware constructor.
+     *
+     * @param string $uriPath
+     */
+    public function __construct(string $uriPath = self::DEFAULT_URI_PATH)
     {
-        if (!in_array($path, $this->robotsTxtUriPaths)) {
-            $this->robotsTxtUriPaths[] = $path;
-            return true;
-        }
-        return false;
+        parent::__construct();
+        $this->uriPath = $uriPath;
     }
 
     /**
-     * Returns the lists of URI paths for which the robots.txt file is returned.
+     * Returns the URI path for which the robots.txt file is returned.
      *
-     * @return array
+     * @return string
      */
-    public function getRobotsTxtUriPaths():array
+    public function getUriPath():string
     {
-        return $this->robotsTxtUriPaths;
+        return $this->uriPath;
     }
 
     /**
@@ -94,6 +94,6 @@ class RobotsTxtMiddleware extends Robots implements MiddlewareInterface
      */
     public function isRobotsTxtRequest(ServerRequestInterface $request):bool
     {
-        return in_array($request->getUri()->getPath(), $this->robotsTxtUriPaths);
+        return $request->getUri()->getPath() == $this->uriPath;
     }
 }

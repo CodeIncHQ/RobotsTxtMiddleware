@@ -21,11 +21,11 @@
 //
 declare(strict_types=1);
 namespace CodeInc\RobotsTxtMiddleware\Tests;
+use CodeInc\MiddlewareTestKit\BlankResponse;
+use CodeInc\MiddlewareTestKit\FakeRequestHandler;
+use CodeInc\MiddlewareTestKit\FakeServerRequest;
 use CodeInc\RobotsTxtMiddleware\Assets\RobotsTxtResponse;
 use CodeInc\RobotsTxtMiddleware\RobotsTxtMiddleware;
-use CodeInc\RobotsTxtMiddleware\Tests\Assets\BlankResponse;
-use CodeInc\RobotsTxtMiddleware\Tests\Assets\FakeRequestHandler;
-use CodeInc\RobotsTxtMiddleware\Tests\Assets\FakeServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
@@ -33,6 +33,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Class RobotsTxtMiddlewareTest
  *
+ * @uses  RobotsTxtMiddleware
  * @package CodeInc\RobotsTxtMiddleware\Tests
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
@@ -40,10 +41,11 @@ class RobotsTxtMiddlewareTest extends TestCase
 {
     public function testRegularRequest():void
     {
-        $middleware = $this->getMiddleware();
-        $request = FakeServerRequest::getUnsecureServerRequestWithPath('/test');
-        self::assertFalse($middleware->isRobotsTxtRequest($request));
-        $response = $middleware->process(
+        $robotsTxtMiddleware = new RobotsTxtMiddleware();
+        $robotsTxtMiddleware->addAllow('/test.html');
+        $request = FakeServerRequest::getUnsecureServerRequestWithPath('/a-page.html');
+        self::assertFalse($robotsTxtMiddleware->isRobotsTxtRequest($request));
+        $response = $robotsTxtMiddleware->process(
             $request,
             new FakeRequestHandler()
         );
@@ -53,51 +55,25 @@ class RobotsTxtMiddlewareTest extends TestCase
 
     public function testRobotsTxtRequest():void
     {
-        $middleware = $this->getMiddleware();
-        $request = FakeServerRequest::getUnsecureServerRequestWithPath('/robots.txt');
-        self::assertTrue($middleware->isRobotsTxtRequest($request));
-        $response = $middleware->process(
-            $request,
-            new FakeRequestHandler()
-        );
-        self::assertSiteMapResponse($response);
-    }
+        foreach ([RobotsTxtMiddleware::DEFAULT_URI_PATH, '/test/robots.txt'] as $uriPath) {
+            $robotsTxtMiddleware = new RobotsTxtMiddleware($uriPath);
+            $robotsTxtMiddleware->addAllow('/test.html');
+            $robotsTxtMiddleware->addDisallow('/private');
+            $robotsTxtMiddleware->addSitemap('/sitemap.xml');
 
-    public function testCustomRobotsTxtRequest():void
-    {
-        $middleware = $this->getMiddleware();
-        $middleware->addRobotsTxtUriPath('/test/robots.txt');
-        $request = FakeServerRequest::getUnsecureServerRequestWithPath('/test/robots.txt');
-        self::assertTrue($middleware->isRobotsTxtRequest($request));
-        $response = $middleware->process(
-            $request,
-            new FakeRequestHandler()
-        );
-        self::assertSiteMapResponse($response);
-    }
+            $request = FakeServerRequest::getUnsecureServerRequestWithPath($uriPath);
+            self::assertTrue($robotsTxtMiddleware->isRobotsTxtRequest($request));
+            $response = $robotsTxtMiddleware->process(
+                $request,
+                new FakeRequestHandler()
+            );
 
-    /**
-     * @return RobotsTxtMiddleware
-     */
-    private function getMiddleware():RobotsTxtMiddleware
-    {
-        $middleware = new RobotsTxtMiddleware();
-        $middleware->addAllow('/test.html');
-        $middleware->addDisallow('/private');
-        $middleware->addSitemap('/sitemap.xml');
-        return $middleware;
-    }
-
-    /**
-     * @param ResponseInterface $response
-     */
-    private static function assertSiteMapResponse(ResponseInterface $response):void
-    {
-        self::assertInstanceOf(ResponseInterface::class, $response);
-        self::assertInstanceOf(RobotsTxtResponse::class, $response);
-        $responseBody = $response->getBody()->__toString();
-        self::assertRegExp('#Sitemap:\\s+/sitemap.xml#ui', $responseBody);
-        self::assertRegExp('#Disallow:\\s+/private#ui', $responseBody);
-        self::assertRegExp('#Allow:\\s+/test.html#ui', $responseBody);
+            self::assertInstanceOf(ResponseInterface::class, $response);
+            self::assertInstanceOf(RobotsTxtResponse::class, $response);
+            $responseBody = $response->getBody()->__toString();
+            self::assertRegExp('#Sitemap:\\s+/sitemap.xml#ui', $responseBody);
+            self::assertRegExp('#Disallow:\\s+/private#ui', $responseBody);
+            self::assertRegExp('#Allow:\\s+/test.html#ui', $responseBody);
+        }
     }
 }
