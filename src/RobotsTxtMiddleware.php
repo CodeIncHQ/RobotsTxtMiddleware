@@ -96,4 +96,19 @@ class RobotsTxtMiddleware extends Robots implements MiddlewareInterface
     {
         return $request->getUri()->getPath() == $this->uriPath;
     }
+
+    /**
+     * Disallow all robots on /.
+     *
+     * @param string $uriPath
+     * @param string $baseUrl
+     * @return RobotsTxtMiddleware
+     */
+    public static function disallowAll(string $uriPath = self::DEFAULT_URI_PATH, string $baseUrl = '/'):self
+    {
+        $robotTxtMiddlewre = new self($uriPath);
+        $robotTxtMiddlewre->addUserAgent('*');
+        $robotTxtMiddlewre->addDisallow($baseUrl);
+        return $robotTxtMiddlewre;
+    }
 }
