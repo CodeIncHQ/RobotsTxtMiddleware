@@ -71,9 +71,10 @@ class RobotsTxtMiddlewareTest extends TestCase
             self::assertInstanceOf(ResponseInterface::class, $response);
             self::assertInstanceOf(RobotsTxtResponse::class, $response);
             $responseBody = $response->getBody()->__toString();
-            self::assertRegExp('#Sitemap:\\s+/sitemap.xml#ui', $responseBody);
-            self::assertRegExp('#Disallow:\\s+/private#ui', $responseBody);
-            self::assertRegExp('#Allow:\\s+/test.html#ui', $responseBody);
+            self::assertNotEmpty($responseBody);
+            self::assertRegExp('#Sitemap: /sitemap.xml#ui', $responseBody);
+            self::assertRegExp('#Disallow: /private#ui', $responseBody);
+            self::assertRegExp('#Allow: /test.html#ui', $responseBody);
         }
     }
 
