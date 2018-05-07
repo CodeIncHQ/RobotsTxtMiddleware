@@ -71,9 +71,48 @@ class RobotsTxtMiddlewareTest extends TestCase
             self::assertInstanceOf(ResponseInterface::class, $response);
             self::assertInstanceOf(RobotsTxtResponse::class, $response);
             $responseBody = $response->getBody()->__toString();
-            self::assertRegExp('#Sitemap:\\s+/sitemap.xml#ui', $responseBody);
-            self::assertRegExp('#Disallow:\\s+/private#ui', $responseBody);
-            self::assertRegExp('#Allow:\\s+/test.html#ui', $responseBody);
+            self::assertNotEmpty($responseBody);
+            self::assertRegExp('#Sitemap: /sitemap.xml#ui', $responseBody);
+            self::assertRegExp('#Disallow: /private#ui', $responseBody);
+            self::assertRegExp('#Allow: /test.html#ui', $responseBody);
         }
+    }
+
+    public function testDisallowAll():void
+    {
+        $robotsTxtMiddleware = RobotsTxtMiddleware::disallowAll();
+        $request = FakeServerRequest::getUnsecureServerRequestWithPath(RobotsTxtMiddleware::DEFAULT_URI_PATH);
+        self::assertTrue($robotsTxtMiddleware->isRobotsTxtRequest($request));
+        $response = $robotsTxtMiddleware->process(
+            $request,
+            new FakeRequestHandler()
+        );
+
+        self::assertInstanceOf(ResponseInterface::class, $response);
+        self::assertInstanceOf(RobotsTxtResponse::class, $response);
+
+        $responseBody = $response->getBody()->__toString();
+        self::assertNotEmpty($responseBody);
+        self::assertRegExp('#User-agent: \\*#ui', $responseBody);
+        self::assertRegExp('#Disallow: /#ui', $responseBody);
+    }
+
+    public function testAllowAll():void
+    {
+        $robotsTxtMiddleware = RobotsTxtMiddleware::allowAll();
+        $request = FakeServerRequest::getUnsecureServerRequestWithPath(RobotsTxtMiddleware::DEFAULT_URI_PATH);
+        self::assertTrue($robotsTxtMiddleware->isRobotsTxtRequest($request));
+        $response = $robotsTxtMiddleware->process(
+            $request,
+            new FakeRequestHandler()
+        );
+
+        self::assertInstanceOf(ResponseInterface::class, $response);
+        self::assertInstanceOf(RobotsTxtResponse::class, $response);
+
+        $responseBody = $response->getBody()->__toString();
+        self::assertNotEmpty($responseBody);
+        self::assertRegExp('#User-agent: \\*#ui', $responseBody);
+        self::assertRegExp('#Allow:\ /#ui', $responseBody);
     }
 }
