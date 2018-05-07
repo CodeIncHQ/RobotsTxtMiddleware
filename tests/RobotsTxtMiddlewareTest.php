@@ -95,4 +95,23 @@ class RobotsTxtMiddlewareTest extends TestCase
         self::assertRegExp('#User-agent: \\*#ui', $responseBody);
         self::assertRegExp('#Disallow: /#ui', $responseBody);
     }
+
+    public function testAllowAll():void
+    {
+        $robotsTxtMiddleware = RobotsTxtMiddleware::allowAll();
+        $request = FakeServerRequest::getUnsecureServerRequestWithPath(RobotsTxtMiddleware::DEFAULT_URI_PATH);
+        self::assertTrue($robotsTxtMiddleware->isRobotsTxtRequest($request));
+        $response = $robotsTxtMiddleware->process(
+            $request,
+            new FakeRequestHandler()
+        );
+
+        self::assertInstanceOf(ResponseInterface::class, $response);
+        self::assertInstanceOf(RobotsTxtResponse::class, $response);
+
+        $responseBody = $response->getBody()->__toString();
+        self::assertNotEmpty($responseBody);
+        self::assertRegExp('#User-agent: \\*#ui', $responseBody);
+        self::assertRegExp('#Allow:\ /#ui', $responseBody);
+    }
 }
