@@ -42,13 +42,12 @@ class RobotsTxtResponse extends TextResponse
      * @param Robots $robots
      * @param int $code
      * @param string $reasonPhrase
-     * @param string $charset
      * @param array $headers
      * @param string $version
      */
     public function __construct(Robots $robots, int $code = 200, string $reasonPhrase = '',
-        string $charset = 'utf-8', array $headers = [], string $version = '1.1')
+        array $headers = self::DEFAULT_HEADERS, string $version = '1.1')
     {
-        parent::__construct($robots->generate(), $code, $reasonPhrase, $charset, $headers, $version);
+        parent::__construct($robots->generate(), $code, $reasonPhrase, $headers, $version);
     }
 }
