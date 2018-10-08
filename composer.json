@@ -1,6 +1,6 @@
 {
   "name": "codeinc/robots-txt-middleware",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A PSR-15 middleware to answers /robots.txt requests",
   "homepage": "https://github.com/CodeIncHQ/RobotsTxtMiddleware",
   "type": "library",
