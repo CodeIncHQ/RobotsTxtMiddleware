@@ -40,15 +40,15 @@ class RobotsTxtResponse extends TextResponse
      * RobotsTxtResponse constructor.
      *
      * @param Robots $robots
-     * @param null|string $charset
-     * @param int $status
+     * @param int $code
+     * @param string $reasonPhrase
+     * @param string $charset
      * @param array $headers
      * @param string $version
-     * @param null|string $reason
      */
-    public function __construct(Robots $robots, ?string $charset = null, int $status = 200,
-        array $headers = [], string $version = '1.1', ?string $reason = null)
+    public function __construct(Robots $robots, int $code = 200, string $reasonPhrase = '',
+        string $charset = 'utf-8', array $headers = [], string $version = '1.1')
     {
-        parent::__construct($robots->generate(), $charset, $status, $headers, $version, $reason);
+        parent::__construct($robots->generate(), $code, $reasonPhrase, $charset, $headers, $version);
     }
 }
